@@ -29,12 +29,16 @@ Members can edit their own name, city, bio and directory visibility, but only an
 1. **Create the project.** Sign up at supabase.com, create a new project named `cfas-demo`, and pick the **East US** region. Save the database password somewhere safe.
 2. **Create the tables.** In the project, open **SQL Editor → New query**, paste the whole contents of `migrations/20261015000000_initial_schema.sql`, and click **Run**.
 3. **Load the demo data.** New query again, paste `seed/demo_seed.sql`, and click **Run**.
-4. **Get the connection details** from **Project Settings → API** (or **Connect**):
-   - the **Project URL**
-   - the **publishable** key (older projects call it the **anon** key)
+4. **Get the connection details** and put them in `js/config.js`:
+   - **Project URL:** shown on the project's home page, or click **Connect** at the top.
+   - **Publishable key:** gear icon (**Settings**) at the bottom of the left sidebar → **API Keys** → the key starting with `sb_publishable_`. (Older projects: the **anon** key on the "Legacy API keys" tab.)
 
    Both are designed to be public and are safe to put in the website code; the permission rules above are what protect the data.
-   **Never share or commit the `secret` / `service_role` key.** It bypasses every rule.
+   **Never share or commit the `sb_secret_` / `service_role` key.** It bypasses every rule.
+5. **Tell Supabase where the site lives**, so confirmation and password-reset emails link back to it. Go to **Authentication → URL Configuration**:
+   - **Site URL:** `https://mrjeckyll.github.io/cfas-website/`
+   - **Redirect URLs → Add URL:** `https://mrjeckyll.github.io/cfas-website/**` (and later your own domain, e.g. `https://www.yourdomain.org/**`)
+6. **(Optional, while testing)** Supabase's built-in email sender only allows a few emails per hour. To test sign-ups quickly, turn off **Authentication → Sign In / Providers → Email → Confirm email**. Turn it back on before launch.
 
 ## Making yourself the first admin
 

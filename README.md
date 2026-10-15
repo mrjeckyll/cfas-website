@@ -1,36 +1,41 @@
-# Central Florida Audiophile Society — Website
+# Central Florida Audiophile Society: Website
 
-Demo website for the Central Florida Audiophile Society (CFAS), prepared for club review before going live on our domain.
+The CFAS club website: events calendar with RSVPs, news, the Reference Playlist listening guide, a members-only gear marketplace, member systems, a member directory, and admin tools. Data and logins are handled by [Supabase](https://supabase.com); the site itself is plain HTML, CSS and JavaScript with no build step.
+
+**Live (demo data):** https://mrjeckyll.github.io/cfas-website/
 
 ## What's here
 
-| File | What it is |
+| Path | What it is |
 | --- | --- |
-| `index.html` | The entire site: pages, styles, and scripts in one file. No build step. |
-| `assets/cfas-logo.png` | The club logo (the same image is also embedded inside `index.html`). |
+| `index.html` | Page layout and all static text (home, playlist, resources, join, sign in). |
+| `css/site.css` | Colors, fonts and layout. Colors are named once at the top (`--red` is the logo red). |
+| `js/config.js` | Supabase project address and publishable key. Safe to be public. |
+| `js/app.js` | Sign-in, calendar, RSVPs, news, gear, systems, directory, admin. |
+| `js/playlist.js` | Reference Playlist tracks and notes (the `PL` list). |
+| `assets/cfas-logo.png` | Club logo. |
+| `demo-static.html` | The original no-database demo, kept for reference. |
+| `supabase/` | Database design, permission rules, demo data. See `supabase/README.md`. |
 
-## Viewing it
+## Common edits
 
-Download or clone the repository and double-click `index.html` to open it in any browser.
+- **Home page text, Resources, Join wording:** `index.html`, find the section comment (`<!-- HOME -->`, `<!-- RESOURCES -->`, …).
+- **Playlist tracks:** `js/playlist.js`.
+- **Colors and fonts:** top of `css/site.css`.
+- **Events, news, members, listings:** don't edit code. Sign in as an admin and use the site.
 
-## Editing it
+Changes pushed to the `main` branch go live on GitHub Pages within a minute or two.
 
-Open `index.html` in a code editor such as [VS Code](https://code.visualstudio.com/) (free).
+## Trying it locally
 
-- **Colors and fonts:** the `<style>` section at the top. Colors are named once at the very top (`--red` is the logo red, `--paper` / `--ink` are background and text) and used everywhere.
-- **Page content:** each page starts with a comment such as `<!-- HOME -->`, `<!-- NEWS -->`, `<!-- RESOURCES -->`, `<!-- JOIN -->`. Headlines, news posts, and the suggested-features list live here.
-- **Sample events:** the `SAMPLE` list in the `<script>` section near the bottom.
-- **Reference Playlist tracks:** the `PL` list in the same `<script>` section.
-- **Logo:** the long line beginning `data:image/png;base64` is the embedded logo. Don't edit it by hand.
+Browsers block some sign-in features on `file://` pages, so serve the folder instead:
 
-Save, then refresh the browser to see the change.
+```
+python3 -m http.server 8000
+```
 
-## Demo limitations
+then open http://localhost:8000. Add `http://localhost:8000` to Supabase's redirect URLs (see `supabase/README.md`) if you want email links to come back to your machine.
 
-- **Admin view on the calendar** is a demonstration. Events added there are saved only in the viewer's own browser. The live site will need real administrator logins.
-- **Forms** (Join, Add your system) show a confirmation but don't send anything yet.
-- Content marked **Sample** or **Example** is placeholder text.
+## Who sees what
 
-## Going live
-
-The site can be published from this repository with GitHub Pages, Netlify, or Cloudflare Pages, and then the club's domain is pointed at it with a DNS setting at the domain registrar.
+Public visitors see events (date, time, general area), news, the playlist and resources. Approved members also see session addresses, RSVPs, the directory, gear for sale and member systems. Admins add events and posts and approve members. These rules are enforced by the database, not just the page.
