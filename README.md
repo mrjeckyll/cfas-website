@@ -39,3 +39,9 @@ then open http://localhost:8000. Add `http://localhost:8000` to Supabase's redir
 ## Who sees what
 
 Public visitors see events (date, time, general area), news, the playlist and resources. Approved members also see session addresses, RSVPs, the directory, gear for sale and member systems. Admins add events and posts and approve members. These rules are enforced by the database, not just the page.
+
+## Member and admin roles
+
+Each account (one email) is either a **member** or a **member with admin rights**. Admins can do everything members can, plus manage the site. Promote or demote someone from the **Admin** page with **Make admin** / **Remove admin**.
+
+Admins see an **Admin tools** switch next to their name. Turning it off hides the Admin page and the add/edit/delete buttons so the site looks exactly as a regular member sees it, which is handy for demos. It doesn't change the account's rights; turn it back on any time.

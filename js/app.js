@@ -23,7 +23,12 @@ const sb = window.supabase.createClient(C.supabaseUrl, C.supabaseKey);
 const S = { session: null, profile: null };
 const signedIn = () => !!S.session;
 const isMember = () => S.profile?.status === "active";
-const isAdmin = () => isMember() && S.profile.role === "admin";
+const hasAdminRole = () => isMember() && S.profile.role === "admin";   // what the database allows
+// Admins can switch to "member view" to see the site exactly as a regular member does.
+// This only changes what's shown; the account keeps its admin rights.
+let memberView = false;
+try { memberView = localStorage.getItem("cfas-member-view") === "1"; } catch (e) {}
+const isAdmin = () => hasAdminRole() && !memberView;
 
 // ---------- dates (always shown in Eastern time) ----------
 const fmt = (d, o) => new Intl.DateTimeFormat("en-US", { timeZone: TZ, ...o }).format(new Date(d));
@@ -96,8 +101,17 @@ function renderAcct() {
     a.innerHTML = `<a class="btn small" href="#signin">Sign in</a><a class="btn small primary" href="#join">Join</a>`;
   } else {
     const name = S.profile?.display_name || S.session.user.email;
-    a.innerHTML = `<a class="who" href="#account" title="Your profile">${esc(name)}</a>${S.profile?.status === "pending" ? `<span class="pill warn">Pending</span>` : ""}<button class="btn small" id="signOut">Sign out</button>`;
+    const toggle = hasAdminRole()
+      ? `<label class="switch" title="Hide admin tools to see the site as a regular member"><input type="checkbox" id="adminMode" ${memberView ? "" : "checked"}> Admin tools</label>`
+      : "";
+    a.innerHTML = `<a class="who" href="#account" title="Your profile">${esc(name)}</a>${S.profile?.status === "pending" ? `<span class="pill warn">Pending</span>` : ""}${toggle}<button class="btn small" id="signOut">Sign out</button>`;
     $("signOut").onclick = async () => { await sb.auth.signOut(); location.hash = "#home"; };
+    if (toggle) $("adminMode").onchange = e => {
+      memberView = !e.target.checked;
+      try { localStorage.setItem("cfas-member-view", memberView ? "1" : "0"); } catch (err) {}
+      renderAcct();
+      if (memberView && current === "admin") location.hash = "#home"; else refresh();
+    };
   }
   $("navAdmin").hidden = !isAdmin();
 }
@@ -552,7 +566,7 @@ function renderAccount() {
     <label class="f full switch"><input type="checkbox" id="pfShow" ${p.show_in_directory ? "checked" : ""}> Show me in the member directory</label>
     <div class="full"><button class="btn primary" type="submit">Save profile</button><p id="pfMsg"></p></div>
   </form>
-  <div><h3>Account</h3><p class="mini">Signed in as ${esc(S.session.user.email)}<br>Status: ${esc(p.status)}${p.role === "admin" ? " · Administrator" : ""}</p></div></div>`;
+  <div><h3>Account</h3><p class="mini">Signed in as ${esc(S.session.user.email)}<br>Status: ${esc(p.status)}${p.role === "admin" ? ` · Administrator${memberView ? " (admin tools hidden)" : ""}` : " · Member"}</p></div></div>`;
   $("profForm").onsubmit = async e => {
     e.preventDefault();
     const { error } = await sb.from("profiles").update({
